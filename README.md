@@ -9,3 +9,12 @@ Required libraries can be found in requirements.txt.
 Install with the following command:
 `pip install -r requirements.txt`
 
+# Dataset
+CIFAR10
+
+# Training and Evaluation
+The code to train and test the implementation is included in `main.ipynb`.
+
+
+
+

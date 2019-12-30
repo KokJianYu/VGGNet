@@ -24,6 +24,7 @@ def create_model(input):
         else:
             layers.append(nn.Conv2d(input_dim, v, 3, padding=1))
             layers.append(nn.ReLU())
+            layers.append(nn.BatchNorm2d(v))
             input_dim = v
 
     
@@ -31,63 +32,32 @@ def create_model(input):
     return nn.Sequential(*layers)
 
 class VGGNet(nn.Module):
-    def __init__(self, model_type="vgg16"):
+    def __init__(self, model_type="vgg16", num_classes = 1000, is_training = True):
         super(VGGNet, self).__init__()
-
-        # self.net = nn.Sequential(
-        #     # channel-64
-        #     nn.Conv2d(3, 64, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(64, 64, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.MaxPool2d(2,2),
-        #     # channel-128
-        #     nn.Conv2d(64, 128, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(128, 128, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.MaxPool2d(2,2),
-        #     # channel-256
-        #     nn.Conv2d(128, 256, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(256, 256, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(256, 256, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(256, 256, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.MaxPool2d(2,2),
-        #     # channel-512
-        #     nn.Conv2d(256, 512, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(512, 512, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(512, 512, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.Conv2d(512, 512, 3, padding=1),
-        #     nn.ReLU(),
-        #     nn.MaxPool2d(2,2),
-        # )
 
         self.net = create_model(model_type)
 
         self.classifier = nn.Sequential(
             nn.Dropout(0.5),
-            nn.Linear(512*7*7, 4096),
+            nn.Linear(512, 512),
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(4096, 4096),
+            nn.Linear(512, 512),
             nn.ReLU(),
-            nn.Linear(4096, 100),
+            nn.Linear(512, num_classes),
         )
 
-        self.setup_weights()
-        
 
     def setup_weights(self):
         for layer in self.net:
             if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
-                torch.nn.init.xavier_uniform(layer.weight)
+                torch.nn.init.xavier_uniform_(layer.weight)
+                torch.nn.init.zeros_(layer.bias)
+        
+        for layer in self.classifier_train:
+            if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+                torch.nn.init.xavier_uniform_(layer.weight)
+                torch.nn.init.zeros_(layer.bias)
 
     def forward(self, x):
         x = self.net(x)
