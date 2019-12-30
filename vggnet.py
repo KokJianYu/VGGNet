@@ -47,6 +47,8 @@ class VGGNet(nn.Module):
             nn.Linear(512, num_classes),
         )
 
+        self.setup_weights()
+
 
     def setup_weights(self):
         for layer in self.net:
@@ -54,7 +56,7 @@ class VGGNet(nn.Module):
                 torch.nn.init.xavier_uniform_(layer.weight)
                 torch.nn.init.zeros_(layer.bias)
         
-        for layer in self.classifier_train:
+        for layer in self.classifier:
             if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
                 torch.nn.init.xavier_uniform_(layer.weight)
                 torch.nn.init.zeros_(layer.bias)
