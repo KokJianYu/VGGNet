@@ -12,6 +12,13 @@ Install with the following command:
 # Dataset
 CIFAR10
 
+# Model
+I have slightly modified the model to speed up the training process.
+
+For the fully connected layers, instead of having 4096 units, I have changed it to 512 units.
+
+I have also included batch normalization layer to help speed up the training process.
+
 # Training and Evaluation
 The code to train and test the implementation is included in `main.ipynb`.
 
